@@ -1,32 +1,36 @@
-
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 export type UserDocument = User & Document;
 
 export enum UserType {
-  USER = "USER",
-  MM = "MARKET_MAKER"
+  USER = 'USER',
+  MM = 'MARKET_MAKER',
 }
 
 export enum UserStatus {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE"
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
 }
 
 @Schema()
 export class User {
-
-  @Prop({required: true})
+  @Prop({ required: true })
   name: string;
 
-  @Prop()
+  @Prop({ required: true })
+  password: string;
+
+  @Prop({ required: true, default: UserType.USER })
   type: UserType;
 
-  @Prop()
+  @Prop({ required: true })
+  contactEmail: string;
+
+  @Prop({ required: true, default: UserStatus.ACTIVE })
   status: UserStatus;
 
-  @Prop()
+  @Prop({ required: true })
   apiKey: string;
 }
 

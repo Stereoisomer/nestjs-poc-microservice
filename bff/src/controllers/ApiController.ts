@@ -5,16 +5,34 @@ import { ClientProxy } from '@nestjs/microservices';
 export class ApiController {
   constructor(@Inject('USER_SERVICE') private client: ClientProxy) {}
 
+  // @Post('auth/register/user')
+  // registerUser(@Body('user') name: string, @Body('email') email: string) {
+  //   const pattern = { action: 'auth/register' };
+  //   const payload = {
+  //     name: name,
+  //     email: email,
+  //     type: 'USER',
+  //   };
+  //   return this.client.send<any>(pattern, payload);
+  // }
+
   @Post('auth/register')
-  getHello(@Body('user') name: string) {
-    const pattern = { action: 'add_user' };
-    const payload = name;
-    return this.client.emit<any>(pattern, payload); // emit has no return value
+  async registerMarketMaker(
+    @Body('user') name: string,
+    @Body('email') email: string,
+  ) {
+    const pattern = { action: 'auth/register' };
+    const payload = {
+      name: name,
+      email: email,
+      type: 'MARKET_MAKER',
+    };
+    return await this.client.send<any>(pattern, payload);
   }
 
   @Get('auth/list')
-  getUsers() {
+  async getUsers() {
     const event = 'get_allUsers';
-    return this.client.send<any>(event, 123);
+    return await this.client.send<any>(event, 123);
   }
 }

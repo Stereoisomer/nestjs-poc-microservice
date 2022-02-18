@@ -19,10 +19,8 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "~config/*": ["src/config/*"],
-      "~controllers/*": ["src/controllers/*"],
-      "~dto/*": ["src/dto/*"],
       "~schemas/*": ["src/schemas/*"],
-      "~services/*": ["src/services/*"]
+      "~auth/*": ["src/auth//*"]
     }
   }
 }
