@@ -1,22 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { UserStatus, UserType } from '~dto/user.dto';
 
 export type UserDocument = User & Document;
-
-export enum UserType {
-  USER = 'USER',
-  MM = 'MARKET_MAKER',
-}
-
-export enum UserStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-}
 
 @Schema()
 export class User {
   @Prop({ required: true })
-  name: string;
+  username: string;
 
   @Prop({ required: true })
   password: string;

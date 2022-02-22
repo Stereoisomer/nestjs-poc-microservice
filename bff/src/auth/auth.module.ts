@@ -1,23 +1,36 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { PassportModule } from '@nestjs/passport';
 
 // modules
-import { SchemaModule } from '~schemas/schemas.module';
 
 // config
 import JwtConfig from '~config/auth.config';
 
 // service
-import { AuthService } from './auth.service';
+
+// strategies
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
   imports: [
+    ClientsModule.register([
+      {
+        name: 'USER_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: 'localhost',
+          port: 8001,
+        },
+      },
+    ]),
     ConfigModule.forRoot({
       load: [JwtConfig],
     }),
-    SchemaModule,
+    PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -26,7 +39,7 @@ import { AuthService } from './auth.service';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService],
-  exports: [AuthService],
+  providers: [LocalStrategy, JwtStrategy],
+  exports: [ClientsModule],
 })
 export class AuthModule {}

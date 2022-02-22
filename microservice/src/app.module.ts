@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import MongoConfig from '~config/mongo.config';
 
 // modules
+import { AuthModule } from '~auth/auth.module';
 import { SchemaModule } from '~schemas/schemas.module';
 
 // controllers
@@ -29,6 +30,7 @@ import { AppController } from './app.controller';
       inject: [ConfigService],
     }),
     SchemaModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [],

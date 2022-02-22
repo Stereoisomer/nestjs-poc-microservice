@@ -20,7 +20,9 @@
     "paths": {
       "~config/*": ["src/config/*"],
       "~schemas/*": ["src/schemas/*"],
-      "~auth/*": ["src/auth//*"]
+      "~dto/*": ["src/dto/*"],
+      "~auth/*": ["src/auth/*"],
+      "~guards/*": ["src/guards/*"]
     }
   }
 }

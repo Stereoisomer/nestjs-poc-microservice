@@ -1,19 +1,23 @@
 import { Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthModule } from '~auth/auth.module';
+import AuthConfig from '~config/auth.config';
 import { ApiController } from '~controllers/ApiController';
 
 @Module({
   imports: [
-    ClientsModule.register([
-      {
-        name: 'USER_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 8001,
-        },
-      },
-    ]),
+    AuthModule,
+    ConfigModule.forRoot({
+      load: [AuthConfig],
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('auth.jwt.secret'),
+      }),
+      inject: [ConfigService],
+    }),
   ],
   controllers: [ApiController],
   providers: [],
