@@ -15,6 +15,7 @@ import { ApiController } from '~controllers/ApiController';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('auth.jwt.secret'),
+        signOptions: { expiresIn: '3600s' },
       }),
       inject: [ConfigService],
     }),

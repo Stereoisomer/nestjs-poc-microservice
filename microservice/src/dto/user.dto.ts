@@ -9,6 +9,8 @@ export enum UserStatus {
 }
 
 export class UserDto {
+  _id?: any;
+
   username: string;
 
   password: string;

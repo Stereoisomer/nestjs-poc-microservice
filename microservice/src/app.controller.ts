@@ -5,6 +5,7 @@ import {
   RpcException,
 } from '@nestjs/microservices';
 import * as bcrypt from 'bcrypt';
+import { Schema } from 'mongoose';
 
 import { AuthService } from '~auth/auth.service';
 import { UserDto, UserStatus } from '~dto/user.dto';
@@ -58,18 +59,39 @@ export class AppController {
   // @UseGuards(LocalAuthGuard)
   @MessagePattern({ action: 'auth/getUserByName' })
   async getUserByName(username: string) {
-    console.log('inside auth/login');
+    console.log('inside auth/getUserByName');
     console.log(username);
     let result = await this.usersService.findOne({
       username: username,
+    });
+    console.log(result);
+    if (result) {
+      return result;
+    } else return null;
+  }
+
+  @MessagePattern({ action: 'auth/getUserById' })
+  async getUserById(id: string | Schema.Types.ObjectId) {
+    console.log('inside auth/getUserById');
+    console.log(id);
+    let result = await this.usersService.findOne({
+      _id: id,
     });
     if (result) {
       return result;
     } else return null;
   }
 
-  @MessagePattern({ action: 'auth/get_profile' })
-  async getProfile(req: any) {
-    return this.usersService.findOne(req.user);
+  @MessagePattern({ action: 'auth/updateUser' })
+  async updateUser(user: User) {
+    console.log('inside auth/updateUser');
+    console.log('received: ', user);
+    const oldData = await this.getUserById(user._id);
+    console.log('existing records: ', oldData);
+    if (oldData) {
+      const result = await this.usersService.updateById(oldData._id, user);
+      console.log('result: ', result);
+      return result;
+    } else return null;
   }
 }
