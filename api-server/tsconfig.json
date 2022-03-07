@@ -21,8 +21,8 @@
       "~config/*": ["src/config/*"],
       "~controllers/*": ["src/controllers/*"],
       "~dto/*": ["src/dto/*"],
-      "~schemas/*": ["src/schemas/*"],
-      "~services/*": ["src/services/*"]
+      "~guards/*": ["src/guards/*"],
+      "~auth/*": ["src/auth/*"]
     }
   }
 }

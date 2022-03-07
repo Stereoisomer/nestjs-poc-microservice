@@ -6,7 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import MongoConfig from '~config/mongo.config';
 
 // modules
-import { SchemaModule } from '~schemas/schemas.module';
+import { DatabaseModule } from 'src/database/database.module';
 
 // controllers
 import { AppController } from './app.controller';
@@ -18,17 +18,7 @@ import { AppController } from './app.controller';
     ConfigModule.forRoot({
       load: [MongoConfig],
     }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
-        // console.log(configService.get<string>('mongodb.uri'));
-        return {
-          uri: configService.get<string>('mongodb.uri'),
-        };
-      },
-      inject: [ConfigService],
-    }),
-    SchemaModule,
+    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [],
