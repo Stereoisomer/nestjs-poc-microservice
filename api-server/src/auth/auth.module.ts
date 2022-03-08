@@ -26,6 +26,22 @@ import { LocalStrategy } from './strategies/local.strategy';
           port: 8001,
         },
       },
+      {
+        name: 'INSTRUMENT_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: 'localhost',
+          port: 8002,
+        },
+      },
+      {
+        name: 'QUOTE_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: 'localhost',
+          port: 8003,
+        },
+      },
     ]),
     ConfigModule.forRoot({
       load: [JwtConfig],

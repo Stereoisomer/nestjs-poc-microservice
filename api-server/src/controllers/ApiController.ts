@@ -5,19 +5,24 @@ import {
   Inject,
   Post,
   Put,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { LocalAuthGuard } from '~guards/local-auth.guard';
-import { UserApiDto, UserMicroserviceDto, UserType } from '~dto/user.dto';
+import { User, UserApiDto, UserMicroserviceDto, UserType } from '~dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtAuthGuard } from '~guards/jwt-auth.guard';
 import { firstValueFrom } from 'rxjs';
+import { InstrumentDto } from '~dto/instrument.dto';
+import { QuoteDto } from '~dto/quote.dto';
 
 @Controller()
 export class ApiController {
   constructor(
-    @Inject('USER_SERVICE') private client: ClientProxy,
+    @Inject('USER_SERVICE') private userClient: ClientProxy,
+    @Inject('INSTRUMENT_SERVICE') private instrumentClient: ClientProxy,
+    @Inject('QUOTE_SERVICE') private quoteClient: ClientProxy,
     private jwtService: JwtService,
   ) {}
 
@@ -30,7 +35,7 @@ export class ApiController {
       type: UserType.MM,
       contactEmail: userDto.contactEmail,
     };
-    return this.client.send<any>(pattern, payload);
+    return this.userClient.send<any>(pattern, payload);
   }
 
   @Post('auth/login')
@@ -50,12 +55,51 @@ export class ApiController {
 
     console.log(userDto.username);
     const user = await firstValueFrom(
-      this.client.send<any>({ action: 'auth/getUserByName' }, userDto.username),
+      this.userClient.send<any>(
+        { action: 'auth/getUserByName' },
+        userDto.username,
+      ),
     );
 
     console.log(user);
 
     const pattern = { action: 'auth/updateUser' };
-    return this.client.send<any>(pattern, { ...user, ...userDto });
+    return this.userClient.send<any>(pattern, { ...user, ...userDto });
+  }
+
+  @Post('instrument/create')
+  @UseGuards(JwtAuthGuard)
+  async createInstrument(@Body() instrumentDto: InstrumentDto) {
+    console.log('inside createInstrument');
+
+    console.log(instrumentDto);
+    return this.instrumentClient.send<any>(
+      { action: 'instrument/create' },
+      instrumentDto,
+    );
+  }
+
+  @Post('quote/create')
+  @UseGuards(JwtAuthGuard)
+  async createQuote(@Req() req: any) {
+    console.log('inside createQuote');
+    // console.log(req);
+
+    const { username, password } = req.user;
+    console.log(username, password);
+    const body: QuoteDto = req.body;
+    console.log(body);
+
+    const user = await firstValueFrom(
+      this.userClient.send<User>({ action: 'auth/getUserByName' }, username),
+    );
+
+    return this.quoteClient.send<any>(
+      { action: 'quote/create' },
+      {
+        instrument_id: body.instrument_id,
+        user_id: user._id,
+      },
+    );
   }
 }
