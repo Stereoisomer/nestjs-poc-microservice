@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - ../data/db:/data/db
+  apiServer:
+    image: vm-api-server:v3
+    ports:
+      - 3000:3000
+    environment:
+      - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
+      - MONGODB_DBNAME=example
+
+      - INSTRUMENTS_SERVICE_HOST=instruments
+      - INSTRUMENTS_SERVICE_PORT=3001
+
+      - QUOTE_SERVICE_HOST=quote
+      - QUOTE_SERVICE_PORT=3002
+
+      - USERS_SERVICE_HOST=users
+      - USERS_SERVICE_PORT=3003
+    links:
+      - mongodb
+      - instruments:instruments
+      - quote:quote
+      - users:users
+  instruments:
+    image: vm-microservice-instruments:v1
+    ports:
+      - 3001:3001
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3001
+    links:
+      - mongodb
+  quote:
+    image: vm-microservice-quote:v1
+    ports:
+      - 3002:3002
+    links:
+      - mongodb
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3002
+  users:
+    image: vm-microservice-users:v1
+    ports:
+      - 3003:3003
+    links:
+      - mongodb
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3003

@@ -8,6 +8,7 @@ import { PassportModule } from '@nestjs/passport';
 
 // config
 import JwtConfig from '~config/auth.config';
+import MicroservicesConfig from '~config/microservices.config';
 
 // service
 
@@ -17,35 +18,51 @@ import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
   imports: [
-    ClientsModule.register([
+    ConfigModule.forRoot({
+      load: [JwtConfig, MicroservicesConfig],
+    }),
+    ClientsModule.registerAsync([
       {
         name: 'USER_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 8001,
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: async (configService: ConfigService) => {
+          console.log(configService.get<string>('microservices.users.host'));
+          console.log(configService.get<number>('microservices.users.port'));
+          return {
+            transport: Transport.TCP,
+            options: {
+              host: 'users',
+              port: configService.get<number>('microservices.users.port'),
+            },
+          };
         },
       },
       {
         name: 'INSTRUMENT_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 8002,
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.get<string>('microservices.instruments.host'),
+            port: configService.get<number>('microservices.instruments.port'),
+          },
+        }),
       },
       {
         name: 'QUOTE_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 8003,
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.get<string>('microservices.quote.host'),
+            port: configService.get<number>('microservices.quote.port'),
+          },
+        }),
       },
     ]),
-    ConfigModule.forRoot({
-      load: [JwtConfig],
-    }),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
